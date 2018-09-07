@@ -23,7 +23,7 @@
     <ProjectGuid>{DE43F5FE-DB57-4C81-B038-EBC5486DEE58}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CppProfiler</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VSInstallDir)\DIA SDK\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -101,6 +102,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>"C:\Program Files (x86)\Microsoft Visual Studio 14.0\DIA SDK\include";%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +141,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Callback.h" />
+    <ClInclude Include="CppProfilerRunner.hpp" />
+    <ClInclude Include="Debugger.hpp" />
+    <ClInclude Include="ExceptionHandler.hpp" />
+    <ClInclude Include="IDebugEventsHandler.hpp" />
+    <ClInclude Include="MayBe.h" />
+    <ClInclude Include="Process.hpp" />
+    <ClInclude Include="ProcessMemory.hpp" />
+    <ClInclude Include="StartInfo.hpp" />
+    <ClInclude Include="SymbolInfoPDB.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CppProfiler.cpp" />
+    <ClCompile Include="CppProfilerRunner.cpp" />
+    <ClCompile Include="Debugger.cpp" />
+    <ClCompile Include="ExceptionHandler.cpp" />
+    <ClCompile Include="IDebugEventsHandler.cpp" />
+    <ClCompile Include="Process.cpp" />
+    <ClCompile Include="ProcessMemory.cpp" />
+    <ClCompile Include="StartInfo.cpp" />
+    <ClCompile Include="SymbolInfoPDB.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

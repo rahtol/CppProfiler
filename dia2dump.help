@@ -1,0 +1,71 @@
+i:\work\sln\DIA2Dump\x64\Debug>Dia2Dump.exe -sym LOC_Locating_C "I:\work\OBCU_ATP\OBCU_ATP_2.3.1-LAB_2.3.2R\TGMT_OBCU_V\tests\TestCases\bal\bal014a\bal014a.pdb" >LOC_Locatiing.txt
+
+usage: Dia2Dump.exe [ options ] <filename>
+  -?                : print this help
+  -all              : print all the debug info
+  -m                : print all the mods
+  -p                : print all the publics
+  -g                : print all the globals
+  -t                : print all the types
+  -f                : print all the files
+  -s                : print symbols
+  -l [RVA [bytes]]  : print line number info at RVA address in the bytes range
+  -c                : print section contribution info
+  -dbg              : dump debug streams
+  -injsrc [file]    : dump injected source
+  -sf               : dump all source files
+  -oem              : dump all OEM specific types
+  -fpo [RVA]        : dump frame pointer omission information for a func addr
+  -fpo [symbolname] : dump frame pointer omission information for a func symbol
+  -compiland [name] : dump symbols for this compiland
+  -lines <funcname> : dump line numbers for this function
+  -lines <RVA>      : dump line numbers for this address
+  -type <symbolname>: dump this type in detail
+  -label <RVA>      : dump label at RVA
+  -sym <symbolname> [childname] : dump child information of this symbol
+  -sym <RVA> [childname]        : dump child information of symbol at this addr
+  -lsrc  <file> [line]          : dump line numbers for this source file
+  -ps <RVA> [-n <number>]       : dump symbols after this address, default 16
+  -psr <RVA> [-n <number>]      : dump symbols before this address, default 16
+  -annotations <RVA>: dump annotation symbol for this RVA
+  -maptosrc <RVA>   : dump src RVA for this image RVA
+  -mapfromsrc <RVA> : dump image RVA for src RVA
+  
+
+"-compiland debug\MA_ITC_C.obj"  (exact, including dir, no wildcards, case insensitive)
+"-sym LOC_Locating_C"
+load offset 0x00280000 in the example must be considered
+also works with .EXE, same results
+
+bool LoadDataFromPdb(
+    const wchar_t    *szFilename,   // input: filename Pdb/Exe
+    IDiaDataSource  **ppSource,     // output: IDiaSource by CoCreateInstance and ppSource->loadDataForPdb/Exe
+    IDiaSession     **ppSession,    // output: IDiaSession by (*ppSource)->openSession(ppSession) 
+    IDiaSymbol      **ppGlobal)     // output: IDiaSymbol by (*ppSession)->get_globalScope(ppGlobal)
+    
+so far, that's done in any case independant of the args
+ParseArg processes nearly all options, especially there is a if-branch for "-sym" lines 471ff
+"-sym LOC_Locating_C Start" is processed by "DumpSymbolsWithRegEx(g_pGlobalSymbol, argv[1], szChildname)" where argv[1]="LOC_Locating_C" and szChildname="Start"
+
+pGlobal->findChildren(         // starting with global scope IDiaSymbol from initialization
+    SymTagNull, 
+    "LOC_Locating",            // input: name to search for 
+    nsRegularExpression, 
+    &pEnumSymbols)             // output: IDiaEnumSymbols listing all symbol that match "LOC_Locating_C"
+    
+DumpSymbolWithChildren(pSymbol, szChildname)  // where pSymbol now stands for LOC_Locating_C
+pSymbol->findChildren(SymTagNull, szChildname, nsRegularExpression, &pEnumSyms) -> output: IDiaEnumSymbols
+    -> PrintSymbol
+       SymTag == Function
+       -> PrintLocation
+        pSymbol->get_locationType(&dwLocType) // LocIsStatic
+        pSymbol->get_relativeVirtualAddress(&dwRVA) // relative virtual address => that's what i am looking for
+        also interesting
+        pSymbol->get_length(&ulLen)
+        pSymbol->get_callingConvention(&dwCall)
+        -> PrintUndName(pSymbol)
+            Function info: a list of attribute calls
+            pSymbol->findChildren(SymTagNull, NULL, nsNone, &pEnumChildren) // FuncDebugStart, local symbols etc. follows
+            
+the first two findChildren (class lookup and member lookup) are unique, i.e. return enumeration has length 1
+Cleanup() is called to release resources bound in LoadDataFromPdb
